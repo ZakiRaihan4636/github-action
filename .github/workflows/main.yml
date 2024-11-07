@@ -24,6 +24,6 @@ jobs:
         
     - name: 📂 Sync files
       run: |
-        sshpass -p "${{ secrets.DEPLOY_PASSWORD }}" rsync -avzr --delete --exclude=".git" --exclude=".github" \
+        sshpass -p "${{ secrets.DEPLOY_PASSWORD }}" -avzr --delete --exclude=".git" --exclude=".github" \
           -e "ssh -p ${{ secrets.DEPLOY_PORT }} -o StrictHostKeyChecking=no" \
           ./ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}
