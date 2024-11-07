@@ -2,7 +2,7 @@ on:
   push:
     branches: [ main ]
 
-name: 🚀 Deploy website on push
+name: 🚀 Deploy Website on Push
 
 jobs:
   web-deploy:
@@ -11,7 +11,10 @@ jobs:
 
     steps:
     - name: 🚚 Get latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3  # Gunakan versi terbaru
+
+    - name: Install sshpass
+      run: sudo apt-get install -y sshpass  # Install sshpass untuk mengotomatisasi input password
 
     - name: Set up SSH
       run: |
@@ -20,13 +23,8 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H -p 2223 ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
 
-    - name: 📂 Sync files
-      uses: burnett01/rsync-deployments@4.1
-      with:
-        switches: -avzr --delete --exclude=".git" --exclude=".github"
-        path: .
-        remote_path: ${{ secrets.DEPLOY_PATH }}
-        remote_host: ${{ secrets.DEPLOY_HOST }}
-        remote_user: ${{ secrets.DEPLOY_USER }}
-        remote_key: ${{ secrets.DEPLOY_KEY }}
-        remote_port: 2223
+    - name: 📂 Sync files using rsync with password
+      run: |
+        # Menggunakan sshpass untuk menyertakan password SSH dari GitHub Secrets
+        sshpass -p "${{ secrets.DEPLOY_PASSWORD }}" rsync -avzr --delete --exclude=".git" --exclude=".github" \
+        -e "ssh -p 2223 -i ~/.ssh/id_rsa" ./ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}
