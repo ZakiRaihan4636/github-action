@@ -13,4 +13,4 @@ jobs:
       with:
         server: ftp.awwaliyahalasiyah.sch.id
         username: ${{ secrets.FTP_USER }}
-        password: ${{ secrets.FTP_PASSWORD }}
+        password: ${{ secrets.FTP_PASS }}
