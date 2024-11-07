@@ -14,7 +14,12 @@ jobs:
       
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
-
+    - name: Setup SSH key
+      run: |
+             mkdir -p ~/.ssh
+             echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+             chmod 600 ~/.ssh/id_rsa
+             ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
     - name: 📂 Sync files
       uses: burnett01/rsync-deployments@4.1
       env:
