@@ -11,10 +11,18 @@ jobs:
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
+      
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa  # Your SSH private key
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts  # Your remote host
+
       - name: 📂 Sync files
         uses: burnett01/rsync-deployments@4.1
         env:
-          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}  # Use if you have a password (optional)
+          SSHPASS: ${{ secrets.DEPLOY_PASSWORD }}  # Optional, only if needed
         with:
           switches: -avzr --delete --exclude=".git" --exclude=".github"
           path: ./  # Specify the correct path to sync
@@ -22,4 +30,4 @@ jobs:
           remote_host: ${{ secrets.DEPLOY_HOST }}
           remote_user: ${{ secrets.DEPLOY_USER }}
           remote_port: ${{ secrets.DEPLOY_PORT }}
-          rsh: "ssh -o StrictHostKeyChecking=no"  # If using SSH key, no need for sshpass
+          rsh: "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa"  # Correct SSH command
