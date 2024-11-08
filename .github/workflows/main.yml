@@ -16,6 +16,12 @@ jobs:
     - name: 📦 Install sshpass
       run: sudo apt-get install -y sshpass
 
+    - name: 🔑 Add server to known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -p 2223 ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+
     - name: 📂 Sync files
       run: |
         sshpass -p "${{ secrets.DEPLOY_PASSWORD }}" rsync -avzr --delete --exclude=".git" --exclude=".github" ./ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }} -e "ssh -p 2223"
